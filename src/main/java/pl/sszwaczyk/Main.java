@@ -55,7 +55,8 @@ public class Main {
             Invocation.Builder request = resource.request();
             try {
                 Response response = request.get();
-                if(response.getStatus() >= 200 || response.getStatus() < 300) {
+                System.out.println("Response status = " + response.getStatus());
+                if(response.getStatus() >= 200 && response.getStatus() < 300) {
                     statsForService.setSuccessfull(statsForService.getSuccessfull() + 1);
                     System.out.println("Request for service " + service.getId() + " completed successfully");
                 } else {
@@ -64,7 +65,7 @@ public class Main {
                 }
             } catch (Exception ex) {
                 statsForService.setFailed(statsForService.getFailed() + 1);
-                System.out.println("Request for service " + service.getId() + " failed");
+                System.out.println("Request for service " + service.getId() + " failed because of " + ex.getMessage());
             }
 
             Thread.sleep(2000);
