@@ -12,5 +12,6 @@ public class CmdLineSettings {
     @Option(name="-t", aliases="--time", metaVar="Long", usage="How long generate packets (seconds)", required = true)
     private Long time;
 
-
+    @Option(name="-st", aliases="--statsFile", metaVar="FILE", usage="Path where to save statistics file", required = true)
+    private String statsFile;
 }
