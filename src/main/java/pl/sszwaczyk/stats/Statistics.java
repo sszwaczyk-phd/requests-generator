@@ -40,7 +40,6 @@ public class Statistics {
         if(statsForService == null) {
             statsForService = new Stats();
             stats.put(service, statsForService);
-            statsForService = new Stats();
         }
         statsForService.updateFailed();
     }
