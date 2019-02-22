@@ -43,17 +43,19 @@ public class UniformRequestsGenerator extends RequestsGenerator {
             Invocation.Builder request = resource.request();
             try {
                 log.info("Sending request to service " + service.getId());
+                long start = System.currentTimeMillis();
                 Response response = request.get();
+                long timeOfRealization = System.currentTimeMillis() - start;
                 log.info("Response status = " + response.getStatus());
                 if(response.getStatus() >= 200 && response.getStatus() < 300) {
-                    Statistics.getInstance().addSuccessfull(service);
-                    log.info("Request for service " + service.getId() + " completed successfully");
+                    Statistics.getInstance().updateSuccess(service, timeOfRealization);
+                    log.info("Request for service " + service.getId() + " completed successfully in " + timeOfRealization + " ms.");
                 } else {
-                    Statistics.getInstance().addFailed(service);
+                    Statistics.getInstance().updateFailed(service);
                     log.info("Request for service " + service.getId() + " failed");
                 }
             } catch (Exception ex) {
-                Statistics.getInstance().addFailed(service);
+                Statistics.getInstance().updateFailed(service);
                 log.info("Request for service " + service.getId() + " failed because of " + ex.getMessage());
             }
 

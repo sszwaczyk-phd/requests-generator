@@ -16,9 +16,12 @@ public class SaveStatisticsRunnable implements Runnable {
         StringBuilder sb = new StringBuilder();
         Statistics statistics = Statistics.getInstance();
         statistics.getStats().forEach((service, statsForService) -> {
-            sb.append("Stats for service " + service.getId());
-            sb.append("Completed successfully = " + statsForService.getSuccessfull());
-            sb.append("Failed = " + statsForService.getFailed());
+            sb.append("Stats for service " + service.getId() + "\n");
+            sb.append("Genreated requests = " + statsForService.getGeneratedRequests() + "\n");
+            sb.append("Completed successfully = " + statsForService.getSuccess() + "\n");
+            sb.append("Failed = " + statsForService.getFailed() + "\n");
+            sb.append("Total time of realization = " + statsForService.getTotalTimeOfRealization() + " ms\n" );
+            sb.append("Avg. time of realization = " + statsForService.getAverageRealizationTime() + " ms\n");
         });
 
         try (PrintWriter out = new PrintWriter(statsFile)) {

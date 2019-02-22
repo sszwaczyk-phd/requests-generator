@@ -26,25 +26,23 @@ public class Statistics {
         return stats;
     }
 
-    public void addSuccessfull(Service service) {
+    public void updateSuccess(Service service, long timeOfRealization) {
         Stats statsForService = stats.get(service);
         if(statsForService == null) {
             statsForService = new Stats();
-            statsForService.setSuccessfull(1);
             stats.put(service, statsForService);
-        } else {
-            statsForService.addSuccesfull();
         }
+        statsForService.updateSuccess(timeOfRealization);
     }
 
-    public void addFailed(Service service) {
+    public void updateFailed(Service service) {
         Stats statsForService = stats.get(service);
         if(statsForService == null) {
             statsForService = new Stats();
-            statsForService.setFailed(1);
             stats.put(service, statsForService);
-        } else {
-            statsForService.addFailed();
+            statsForService = new Stats();
         }
+        statsForService.updateFailed();
     }
+
 }
