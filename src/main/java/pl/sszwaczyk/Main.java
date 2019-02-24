@@ -7,6 +7,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import pl.sszwaczyk.cmd.CmdLineSettings;
 import pl.sszwaczyk.domain.Service;
+import pl.sszwaczyk.domain.generator.PoissonRequestsGenerator;
 import pl.sszwaczyk.domain.generator.RequestsGenerator;
 import pl.sszwaczyk.domain.generator.UniformRequestsGenerator;
 import pl.sszwaczyk.stats.SaveStatisticsRunnable;
@@ -40,6 +41,12 @@ public class Main {
 
                 requestsGenerator = new UniformRequestsGenerator(services, minGap, maxGap);
 
+            } else if(generator.equals("poisson")) {
+                Double lambda = settings.getLambda();
+                if(lambda == null || lambda == 0 || lambda < 0) {
+                    throw new CmdLineException(parser, "Lambda parameter must be specified and must be greater than 0 for poisson generator");
+                }
+                requestsGenerator = new PoissonRequestsGenerator(services, lambda);
             } else {
 
                 throw new CmdLineException(parser, "Generator not specified");
