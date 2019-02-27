@@ -33,10 +33,10 @@ public abstract class RequestsGenerator {
             Client client = ClientBuilder.newClient();
             client.property(ClientProperties.CONNECT_TIMEOUT, 2000);
 
-            WebTarget resource = client.target("http://" + service.getIp() + ":" + service.getPort() + service.getPath());
+            WebTarget resource = client.target("http://" + service.getIp() + ":" + service.getPort()).queryParam("path", service.getPath());
             Invocation.Builder request = resource.request();
             try {
-                log.info("Sending request to service " + service.getId());
+                log.info("Sending request to service " + service.getId() + " for path " + service.getPath());
                 long start = System.currentTimeMillis();
                 Response response = request.get();
                 long timeOfRealization = System.currentTimeMillis() - start;
@@ -44,6 +44,7 @@ public abstract class RequestsGenerator {
                 if(response.getStatus() >= 200 && response.getStatus() < 300) {
                     Statistics.getInstance().updateSuccess(service, timeOfRealization);
                     log.info("Request for service " + service.getId() + " completed successfully in " + timeOfRealization + " ms.");
+                    log.info("Response size is " + response.getHeaders().get("Content-Length") + " Bytes");
                 } else {
                     Statistics.getInstance().updateFailed(service);
                     log.info("Request for service " + service.getId() + " failed");
