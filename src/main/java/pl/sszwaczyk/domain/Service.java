@@ -9,5 +9,6 @@ public class Service {
     private String ip;
     private Long port;
     private String path;
+    private Double bandwidth;
 
 }
