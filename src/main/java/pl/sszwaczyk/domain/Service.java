@@ -10,5 +10,7 @@ public class Service {
     private Long port;
     private String path;
     private Double bandwidth;
+    private Double maxUneven;
+    private Long maxLatency;
 
 }

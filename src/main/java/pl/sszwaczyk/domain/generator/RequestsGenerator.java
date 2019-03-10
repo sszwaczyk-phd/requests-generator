@@ -38,7 +38,7 @@ public abstract class RequestsGenerator {
             log.info("Service " + service.getId() + " drawn");
 
             Client client = ClientBuilder.newClient();
-            client.property(ClientProperties.CONNECT_TIMEOUT, 2000);
+            client.property(ClientProperties.CONNECT_TIMEOUT, 10000);
 
             WebTarget resource = client.target("http://" + service.getIp() + ":" + service.getPort()).queryParam("path", service.getPath());
             Invocation.Builder request = resource.request();
