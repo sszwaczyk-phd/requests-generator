@@ -43,13 +43,14 @@ public abstract class RequestsGenerator {
 
             WebTarget resource = client.target("http://" + service.getIp() + ":" + service.getPort()).queryParam("path", service.getPath());
             Invocation.Builder request = resource.request();
+            Path path = Paths.get("/tmp/" + UUID.randomUUID());
             try {
                 log.info("Sending request to service " + service.getId() + " for path " + service.getPath());
                 long start = System.currentTimeMillis();
                 Response response = request.get();
                 log.info("Response status = " + response.getStatus());
                 if(response.getStatus() >= 200 && response.getStatus() < 300) {
-                    Path path = downloadFile(response);
+                    downloadFile(response, path);
                     long timeOfRealization = System.currentTimeMillis() - start;
                     deleteFile(path);
                     Statistics.getInstance().updateSuccess(service, timeOfRealization);
@@ -61,6 +62,11 @@ public abstract class RequestsGenerator {
             } catch (Exception ex) {
                 Statistics.getInstance().updateFailed(service);
                 log.error("Request for service " + service.getId() + " failed because of " + ex.getMessage());
+                try {
+                    deleteFile(path);
+                } catch(IOException e) {
+                    log.error("Cannot delete file becouse of " + e.getMessage());
+                }
             }
 
             int gap = getNextGapInSeconds();
@@ -76,8 +82,7 @@ public abstract class RequestsGenerator {
         log.info("File deleted");
     }
 
-    private Path downloadFile(Response response) throws IOException {
-        Path path = Paths.get("/tmp/" + UUID.randomUUID());
+    private Path downloadFile(Response response, Path path) throws IOException {
         InputStream inputStream = response.readEntity(InputStream.class);
         log.info("Downloading to " + path.toAbsolutePath() + "...");
         Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
