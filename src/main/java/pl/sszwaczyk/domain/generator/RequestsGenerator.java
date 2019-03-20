@@ -53,12 +53,12 @@ public abstract class RequestsGenerator {
             Path path = Paths.get("/tmp/" + UUID.randomUUID());
             try {
                 log.info("Sending request to service " + service.getId() + " for path " + service.getPath());
+                Statistics.getInstance().updatePending(service);
                 long start = System.currentTimeMillis();
                 Statistics.getInstance().updateGenerated(service);
                 Response response = request.get();
                 log.info("Response status = " + response.getStatus());
                 if(response.getStatus() >= 200 && response.getStatus() < 300) {
-                    Statistics.getInstance().updatePending(service);
                     Statistics.getInstance().snapshot(everyRequestFile);
                     downloadFile(response, path);
                     long timeOfRealization = System.currentTimeMillis() - start;
