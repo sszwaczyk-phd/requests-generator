@@ -12,6 +12,12 @@ public class CmdLineSettings {
     @Option(name="-st", aliases="--statsFile", metaVar="FILE", usage="Path where to save statistics file", required = true)
     private String statsFile;
 
+    @Option(name="-er", aliases="--requestFile", metaVar="FILE", usage="Path where to save statistics file after every request", required = true)
+    private String everyRequestFile;
+
+    @Option(name="-lf", aliases="--logFile", metaVar="FILE", usage="Path where to save log file", required = true)
+    private String logFile;
+
     @Option(name="-g", aliases="--generator", usage="Generator to use (uniform or poisson)", required = true)
     private String generator;
 

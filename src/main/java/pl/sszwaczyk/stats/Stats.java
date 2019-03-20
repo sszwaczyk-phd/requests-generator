@@ -9,6 +9,7 @@ import java.util.List;
 public class Stats {
 
     private long generatedRequests;
+    private long pending;
     private long success;
     private long failed;
 
@@ -17,16 +18,24 @@ public class Stats {
     private long totalTimeOfRealization;
     private long averageRealizationTime; //miliseconds
 
+    public void updateGenerated() {
+        generatedRequests++;
+    }
+
+    public void updatePending() {
+        pending++;
+    }
+
     public void updateSuccess(Long timeOfRealization) {
-        generatedRequests += 1;
-        this.success +=1;
+        pending -=1;
+        success +=1;
         timesOfRealizations.add(timeOfRealization);
         totalTimeOfRealization += timeOfRealization;
         averageRealizationTime = totalTimeOfRealization / this.success;
     }
 
     public void updateFailed() {
-        generatedRequests += 1;
+        pending -=1;
         failed += 1;
     }
 

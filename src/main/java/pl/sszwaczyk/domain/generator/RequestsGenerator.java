@@ -2,6 +2,8 @@ package pl.sszwaczyk.domain.generator;
 
 import lombok.extern.slf4j.Slf4j;
 import org.glassfish.jersey.client.ClientProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pl.sszwaczyk.domain.Service;
 import pl.sszwaczyk.stats.Statistics;
 
@@ -20,13 +22,17 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-@Slf4j
 public abstract class RequestsGenerator {
+
+    private final Logger log = LoggerFactory.getLogger(RequestsGenerator.class);
 
     protected List<Service> services;
 
-    public RequestsGenerator(List<Service> services) {
+    private String everyRequestFile;
+
+    public RequestsGenerator(List<Service> services, String everyRequestFile) {
         this.services = services;
+        this.everyRequestFile = everyRequestFile;
     }
 
     public void start() throws InterruptedException {
@@ -38,8 +44,8 @@ public abstract class RequestsGenerator {
             log.info("Service " + service.getId() + " drawn");
 
             Client client = ClientBuilder.newClient();
-            client.property(ClientProperties.CONNECT_TIMEOUT, 10000);
-            client.property(ClientProperties.READ_TIMEOUT, 10000);
+            client.property(ClientProperties.CONNECT_TIMEOUT, 20000);
+            client.property(ClientProperties.READ_TIMEOUT, 20000);
 
             WebTarget resource = client.target("http://" + service.getIp() + ":" + service.getPort()).queryParam("path", service.getPath());
             Invocation.Builder request = resource.request();
@@ -47,21 +53,26 @@ public abstract class RequestsGenerator {
             try {
                 log.info("Sending request to service " + service.getId() + " for path " + service.getPath());
                 long start = System.currentTimeMillis();
+                Statistics.getInstance().updateGenerated(service);
                 Response response = request.get();
                 log.info("Response status = " + response.getStatus());
                 if(response.getStatus() >= 200 && response.getStatus() < 300) {
+                    Statistics.getInstance().updatePending(service);
                     downloadFile(response, path);
                     long timeOfRealization = System.currentTimeMillis() - start;
                     deleteFile(path);
                     Statistics.getInstance().updateSuccess(service, timeOfRealization);
                     log.info("Request for service " + service.getId() + " completed successfully in " + timeOfRealization + " ms.");
+                    Statistics.getInstance().snapshot(everyRequestFile);
                 } else {
                     Statistics.getInstance().updateFailed(service);
                     log.info("Request for service " + service.getId() + " failed");
+                    Statistics.getInstance().snapshot(everyRequestFile);
                 }
             } catch (Exception ex) {
                 Statistics.getInstance().updateFailed(service);
                 log.error("Request for service " + service.getId() + " failed because of " + ex.getMessage());
+                Statistics.getInstance().snapshot(everyRequestFile);
                 try {
                     deleteFile(path);
                 } catch(IOException e) {

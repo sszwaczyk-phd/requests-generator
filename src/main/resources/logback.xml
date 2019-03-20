@@ -5,7 +5,7 @@
         </encoder>
     </appender>
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>./request-generator.log</file>
+        <file>${log.file}.log</file>
         <append>false</append>
         <encoder>
             <pattern>%date{yyyy-MM-dd HH:mm:ss.S} %-5level [%logger{15}] %msg%n</pattern>

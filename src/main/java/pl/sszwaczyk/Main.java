@@ -16,7 +16,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-@Slf4j
 public class Main {
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -26,6 +25,8 @@ public class Main {
         CmdLineParser parser = new CmdLineParser(settings);
         try {
             parser.parseArgument(args);
+            String logFile = settings.getLogFile();
+            System.setProperty("log.file", logFile);
 
             List<Service> services = readServicesFromFile(settings.getServicesFile());
 
@@ -40,21 +41,20 @@ public class Main {
                     throw new CmdLineException(parser, "Max gap must be greater then min gap");
                 }
 
-                requestsGenerator = new UniformRequestsGenerator(services, minGap, maxGap);
+                requestsGenerator = new UniformRequestsGenerator(services, settings.getEveryRequestFile(), minGap, maxGap);
 
             } else if(generator.equals("poisson")) {
                 Double lambda = settings.getLambda();
                 if(lambda == null || lambda == 0 || lambda < 0) {
                     throw new CmdLineException(parser, "Lambda parameter must be specified and must be greater than 0 for poisson generator");
                 }
-                requestsGenerator = new PoissonRequestsGenerator(services, lambda);
+                requestsGenerator = new PoissonRequestsGenerator(services, settings.getEveryRequestFile(), lambda);
             } else {
 
                 throw new CmdLineException(parser, "Generator not specified");
 
             }
         } catch (CmdLineException e) {
-            log.error(e.getMessage());
             parser.printUsage(System.out);
             System.exit(1);
         }

@@ -11,8 +11,8 @@ public class PoissonRequestsGenerator  extends RequestsGenerator {
 
     private Random random;
 
-    public PoissonRequestsGenerator(List<Service> services, double lambda) {
-        super(services);
+    public PoissonRequestsGenerator(List<Service> services, String everyRequestFile, double lambda) {
+        super(services, everyRequestFile);
         this.lambda = lambda;
         random = new Random();
     }

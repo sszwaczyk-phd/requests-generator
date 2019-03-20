@@ -6,14 +6,13 @@ import pl.sszwaczyk.domain.Service;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Slf4j
 public class UniformRequestsGenerator extends RequestsGenerator {
 
     private int minGap;
     private int maxGap;
 
-    public UniformRequestsGenerator(List<Service> services, int minGap, int maxGap) {
-        super(services);
+    public UniformRequestsGenerator(List<Service> services, String everyRequestFile, int minGap, int maxGap) {
+        super(services, everyRequestFile);
         this.minGap = minGap;
         this.maxGap = maxGap;
     }
