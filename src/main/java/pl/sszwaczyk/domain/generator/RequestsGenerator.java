@@ -58,6 +58,7 @@ public abstract class RequestsGenerator {
                 log.info("Response status = " + response.getStatus());
                 if(response.getStatus() >= 200 && response.getStatus() < 300) {
                     Statistics.getInstance().updatePending(service);
+                    Statistics.getInstance().snapshot(everyRequestFile);
                     downloadFile(response, path);
                     long timeOfRealization = System.currentTimeMillis() - start;
                     deleteFile(path);
