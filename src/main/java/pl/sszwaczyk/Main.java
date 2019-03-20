@@ -30,6 +30,7 @@ public class Main {
 
             List<Service> services = readServicesFromFile(settings.getServicesFile());
 
+            Long seed = settings.getSeed();
             String generator = settings.getGenerator();
             if(generator.equals("uniform")) {
                 Integer minGap = settings.getMinGap();
@@ -41,14 +42,14 @@ public class Main {
                     throw new CmdLineException(parser, "Max gap must be greater then min gap");
                 }
 
-                requestsGenerator = new UniformRequestsGenerator(services, settings.getEveryRequestFile(), minGap, maxGap);
+                requestsGenerator = new UniformRequestsGenerator(services, settings.getEveryRequestFile(), seed, minGap, maxGap);
 
             } else if(generator.equals("poisson")) {
                 Double lambda = settings.getLambda();
                 if(lambda == null || lambda == 0 || lambda < 0) {
                     throw new CmdLineException(parser, "Lambda parameter must be specified and must be greater than 0 for poisson generator");
                 }
-                requestsGenerator = new PoissonRequestsGenerator(services, settings.getEveryRequestFile(), lambda);
+                requestsGenerator = new PoissonRequestsGenerator(services, settings.getEveryRequestFile(), seed, lambda);
             } else {
 
                 throw new CmdLineException(parser, "Generator not specified");

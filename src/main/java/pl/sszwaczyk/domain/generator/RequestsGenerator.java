@@ -27,16 +27,17 @@ public abstract class RequestsGenerator {
     private final Logger log = LoggerFactory.getLogger(RequestsGenerator.class);
 
     protected List<Service> services;
+    protected Random random;
 
     private String everyRequestFile;
 
-    public RequestsGenerator(List<Service> services, String everyRequestFile) {
+    public RequestsGenerator(List<Service> services, String everyRequestFile, long seed) {
         this.services = services;
         this.everyRequestFile = everyRequestFile;
+        this.random = new Random(seed);
     }
 
     public void start() throws InterruptedException {
-        Random random = new Random();
         int size = services.size();
 
         while(true) {
@@ -44,7 +45,7 @@ public abstract class RequestsGenerator {
             log.info("Service " + service.getId() + " drawn");
 
             Client client = ClientBuilder.newClient();
-            client.property(ClientProperties.CONNECT_TIMEOUT, 20000);
+            client.property(ClientProperties.CONNECT_TIMEOUT, 2);
             client.property(ClientProperties.READ_TIMEOUT, 20000);
 
             WebTarget resource = client.target("http://" + service.getIp() + ":" + service.getPort()).queryParam("path", service.getPath());

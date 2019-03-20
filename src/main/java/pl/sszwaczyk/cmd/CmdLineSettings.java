@@ -18,6 +18,9 @@ public class CmdLineSettings {
     @Option(name="-lf", aliases="--logFile", metaVar="FILE", usage="Path where to save log file", required = true)
     private String logFile;
 
+    @Option(name="-s", aliases="--seed", usage="Seed for random generator", required = true)
+    private Long seed;
+
     @Option(name="-g", aliases="--generator", usage="Generator to use (uniform or poisson)", required = true)
     private String generator;
 

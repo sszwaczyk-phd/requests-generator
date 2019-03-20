@@ -3,18 +3,14 @@ package pl.sszwaczyk.domain.generator;
 import pl.sszwaczyk.domain.Service;
 
 import java.util.List;
-import java.util.Random;
 
 public class PoissonRequestsGenerator  extends RequestsGenerator {
 
     private double lambda;
 
-    private Random random;
-
-    public PoissonRequestsGenerator(List<Service> services, String everyRequestFile, double lambda) {
-        super(services, everyRequestFile);
+    public PoissonRequestsGenerator(List<Service> services, String everyRequestFile, long seed, double lambda) {
+        super(services, everyRequestFile, seed);
         this.lambda = lambda;
-        random = new Random();
     }
 
     @Override
