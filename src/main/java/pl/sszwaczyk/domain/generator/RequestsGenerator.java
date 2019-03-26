@@ -1,7 +1,9 @@
 package pl.sszwaczyk.domain.generator;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.IOUtils;
 import org.glassfish.jersey.client.ClientProperties;
+import org.glassfish.jersey.message.internal.NullOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pl.sszwaczyk.domain.Service;
@@ -50,7 +52,6 @@ public abstract class RequestsGenerator {
 
             WebTarget resource = client.target("http://" + service.getIp() + ":" + service.getPort()).queryParam("path", service.getPath());
             Invocation.Builder request = resource.request();
-            Path path = Paths.get("/tmp/" + UUID.randomUUID());
             try {
                 log.info("Sending request to service " + service.getId() + " for path " + service.getPath());
                 Statistics.getInstance().updatePending(service);
@@ -60,9 +61,8 @@ public abstract class RequestsGenerator {
                 log.info("Response status = " + response.getStatus());
                 if(response.getStatus() >= 200 && response.getStatus() < 300) {
                     Statistics.getInstance().snapshot(everyRequestFile);
-                    downloadFile(response, path);
+                    downloadFile(response);
                     long timeOfRealization = System.currentTimeMillis() - start;
-                    deleteFile(path);
                     Statistics.getInstance().updateSuccess(service, timeOfRealization);
                     log.info("Request for service " + service.getId() + " completed successfully in " + timeOfRealization + " ms.");
                     Statistics.getInstance().snapshot(everyRequestFile);
@@ -75,33 +75,19 @@ public abstract class RequestsGenerator {
                 Statistics.getInstance().updateFailed(service);
                 log.error("Request for service " + service.getId() + " failed because of " + ex.getMessage());
                 Statistics.getInstance().snapshot(everyRequestFile);
-                try {
-                    deleteFile(path);
-                } catch(IOException e) {
-                    log.error("Cannot delete file becouse of " + e.getMessage());
-                }
             }
 
             int gap = getNextGapInSeconds();
             log.info("Generating next request in " + gap + " seconds");
             Thread.sleep(gap * 1000);
-
         }
     }
 
-    private void deleteFile(Path path) throws IOException {
-        log.info("Deleting file " + path.toAbsolutePath() + "...");
-        Files.delete(path);
-        log.info("File deleted");
-    }
-
-    private Path downloadFile(Response response, Path path) throws IOException {
+    private void downloadFile(Response response) throws IOException {
         InputStream inputStream = response.readEntity(InputStream.class);
-        log.info("Downloading to " + path.toAbsolutePath() + "...");
-        Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
-        inputStream.close();
+        log.info("Downloading file...");
+        IOUtils.copy(inputStream, new NullOutputStream());
         log.info("File downloaded");
-        return path;
     }
 
     public abstract int getNextGapInSeconds();
