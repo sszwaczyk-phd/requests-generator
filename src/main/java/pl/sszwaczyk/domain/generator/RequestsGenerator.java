@@ -42,14 +42,27 @@ public abstract class RequestsGenerator {
     public void start() throws InterruptedException {
         int size = services.size();
 
+        Service lastService = null;
         while(true) {
+            boolean drawOk = false;
             Service service = services.get(random.nextInt(size));
+            while (!drawOk) {
+                if(lastService == null) {
+                    lastService = service;
+                    drawOk = true;
+                } else if(service.getId().equals(lastService.getId())) {
+                    log.warn("Drawn same service as last. Drawing again...");
+                    service = services.get(random.nextInt(size));
+                } else {
+                    drawOk = true;
+                }
+            }
             log.info("Service " + service.getId() + " drawn");
 
             Client client = ClientBuilder.newClient();
 
-            client.property(ClientProperties.CONNECT_TIMEOUT, 20000);
-            client.property(ClientProperties.READ_TIMEOUT, 20000);
+            client.property(ClientProperties.CONNECT_TIMEOUT, 500);
+            client.property(ClientProperties.READ_TIMEOUT, 500);
 
             WebTarget resource = client.target("http://" + service.getIp() + ":" + service.getPort()).queryParam("path", service.getPath());
             Invocation.Builder request = resource.request();
