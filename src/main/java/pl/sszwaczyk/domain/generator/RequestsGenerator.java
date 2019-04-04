@@ -47,8 +47,9 @@ public abstract class RequestsGenerator {
             log.info("Service " + service.getId() + " drawn");
 
             Client client = ClientBuilder.newClient();
-            client.property(ClientProperties.CONNECT_TIMEOUT, 20000);
-            client.property(ClientProperties.READ_TIMEOUT, 20000);
+
+            client.property(ClientProperties.CONNECT_TIMEOUT, 1000);
+            client.property(ClientProperties.READ_TIMEOUT, 1000);
 
             WebTarget resource = client.target("http://" + service.getIp() + ":" + service.getPort()).queryParam("path", service.getPath());
             Invocation.Builder request = resource.request();
@@ -75,6 +76,9 @@ public abstract class RequestsGenerator {
                 Statistics.getInstance().updateFailed(service);
                 log.error("Request for service " + service.getId() + " failed because of " + ex.getMessage());
                 Statistics.getInstance().snapshot(everyRequestFile);
+            } finally {
+                log.info("Closing connection...");
+                client.close();
             }
 
             int gap = getNextGapInSeconds();
