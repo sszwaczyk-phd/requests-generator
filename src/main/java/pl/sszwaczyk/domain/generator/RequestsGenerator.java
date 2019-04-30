@@ -1,6 +1,5 @@
 package pl.sszwaczyk.domain.generator;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.IOUtils;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.message.internal.NullOutputStream;
@@ -16,13 +15,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 public abstract class RequestsGenerator {
 
@@ -44,6 +38,7 @@ public abstract class RequestsGenerator {
 
         Service lastService = null;
         while(true) {
+
             boolean drawOk = false;
             Service service = services.get(random.nextInt(size));
             while (!drawOk) {
@@ -59,10 +54,37 @@ public abstract class RequestsGenerator {
             }
             log.info("Service " + service.getId() + " drawn");
 
+            new Thread(new RealizeService(service)).start();
+
+            int gap = getNextGapInSeconds();
+            log.info("Generating next request in " + gap + " seconds");
+            Thread.sleep(gap * 1000);
+        }
+    }
+
+    private void downloadFile(Response response) throws IOException {
+        InputStream inputStream = response.readEntity(InputStream.class);
+        log.info("Downloading file...");
+        IOUtils.copy(inputStream, new NullOutputStream());
+        log.info("File downloaded");
+    }
+
+    public abstract int getNextGapInSeconds();
+
+    class RealizeService implements Runnable {
+
+        private Service service;
+
+        public RealizeService(Service service) {
+            this.service = service;
+        }
+
+        @Override
+        public void run() {
             Client client = ClientBuilder.newClient();
 
-            client.property(ClientProperties.CONNECT_TIMEOUT, 500);
-            client.property(ClientProperties.READ_TIMEOUT, 500);
+            client.property(ClientProperties.CONNECT_TIMEOUT, 20000);
+            client.property(ClientProperties.READ_TIMEOUT, 5000);
 
             WebTarget resource = client.target("http://" + service.getIp() + ":" + service.getPort()).queryParam("path", service.getPath());
             Invocation.Builder request = resource.request();
@@ -93,20 +115,7 @@ public abstract class RequestsGenerator {
                 log.info("Closing connection...");
                 client.close();
             }
-
-            int gap = getNextGapInSeconds();
-            log.info("Generating next request in " + gap + " seconds");
-            Thread.sleep(gap * 1000);
         }
+
     }
-
-    private void downloadFile(Response response) throws IOException {
-        InputStream inputStream = response.readEntity(InputStream.class);
-        log.info("Downloading file...");
-        IOUtils.copy(inputStream, new NullOutputStream());
-        log.info("File downloaded");
-    }
-
-    public abstract int getNextGapInSeconds();
-
 }

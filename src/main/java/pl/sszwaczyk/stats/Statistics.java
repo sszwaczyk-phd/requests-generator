@@ -38,7 +38,7 @@ public class Statistics {
         return stats;
     }
 
-    public void updateGenerated(Service service) {
+    synchronized public void updateGenerated(Service service) {
         Stats statsForService = stats.get(service);
         if(statsForService == null) {
             statsForService = new Stats();
@@ -47,7 +47,7 @@ public class Statistics {
         statsForService.updateGenerated();
     }
 
-    public void updatePending(Service service) {
+    synchronized public void updatePending(Service service) {
         Stats statsForService = stats.get(service);
         if(statsForService == null) {
             statsForService = new Stats();
@@ -56,7 +56,7 @@ public class Statistics {
         statsForService.updatePending();
     }
 
-    public void updateSuccess(Service service, long timeOfRealization) {
+    synchronized public void updateSuccess(Service service, long timeOfRealization) {
         Stats statsForService = stats.get(service);
         if(statsForService == null) {
             statsForService = new Stats();
@@ -65,7 +65,7 @@ public class Statistics {
         statsForService.updateSuccess(timeOfRealization);
     }
 
-    public void updateFailed(Service service) {
+    synchronized public void updateFailed(Service service) {
         Stats statsForService = stats.get(service);
         if(statsForService == null) {
             statsForService = new Stats();
