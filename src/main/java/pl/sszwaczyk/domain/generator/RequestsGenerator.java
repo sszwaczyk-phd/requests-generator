@@ -50,6 +50,7 @@ public abstract class RequestsGenerator {
                     service = services.get(random.nextInt(size));
                 } else {
                     drawOk = true;
+                    lastService = service;
                 }
             }
             log.info("Service " + service.getId() + " drawn");
